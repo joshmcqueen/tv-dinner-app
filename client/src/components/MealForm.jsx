@@ -92,7 +92,7 @@ export default function MealForm() {
       if (photoFile) fd.append('photo', photoFile);
 
       const meal = isEdit ? await updateMeal(id, fd) : await createMeal(fd);
-      navigate(`/meal/${meal.id}`);
+      navigate(isEdit ? '/' : `/meal/${meal.id}`);
     } catch (e) {
       setError(e.message);
     } finally {

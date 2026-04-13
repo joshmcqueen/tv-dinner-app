@@ -18,9 +18,10 @@ function cookedInfo(cookedAt) {
   return { dateLabel, ageLabel, days };
 }
 
-export default function MealCard({ meal, onConsume }) {
+export default function MealCard({ meal, onConsume, archived, onRestore }) {
   const navigate = useNavigate();
   const [eating, setEating] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   function handleConsume(e) {
     e.preventDefault();
@@ -29,6 +30,14 @@ export default function MealCard({ meal, onConsume }) {
     setEating(true);
     onConsume(meal.id);
     setTimeout(() => setEating(false), 1400);
+  }
+
+  function handleRestore(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (restoring) return;
+    setRestoring(true);
+    onRestore(meal.id);
   }
 
   const isLow = meal.servings <= 2;
@@ -52,9 +61,11 @@ export default function MealCard({ meal, onConsume }) {
 
         <div className="meal-card-meta">
           <StarRating value={meal.rating} readonly size="small" />
-          <span className={`servings-badge ${isLow ? 'low' : ''}`}>
-            {meal.servings} left
-          </span>
+          {!archived && (
+            <span className={`servings-badge ${isLow ? 'low' : ''}`}>
+              {meal.servings} left
+            </span>
+          )}
         </div>
 
         {(meal.calories || meal.protein) && (
@@ -68,16 +79,24 @@ export default function MealCard({ meal, onConsume }) {
         {cooked && (
           <div className="cooked-line">
             <span className="cooked-date">{cooked.dateLabel}</span>
-            <span className={`cooked-age ${cooked.days >= 21 ? 'old' : cooked.days >= 14 ? 'aging' : ''}`}>
-              {cooked.ageLabel}
-            </span>
+            {!archived && (
+              <span className={`cooked-age ${cooked.days >= 21 ? 'old' : cooked.days >= 14 ? 'aging' : ''}`}>
+                {cooked.ageLabel}
+              </span>
+            )}
           </div>
         )}
       </div>
 
-      <button className={`consume-btn ${eating ? 'eating' : ''}`} onClick={handleConsume}>
-        {eating ? '✓ Logged!' : '🥡 I ate!'}
-      </button>
+      {archived ? (
+        <button className="restore-btn" onClick={handleRestore} disabled={restoring}>
+          {restoring ? '↩ Restoring…' : '↩ Restore'}
+        </button>
+      ) : (
+        <button className={`consume-btn ${eating ? 'eating' : ''}`} onClick={handleConsume}>
+          {eating ? '✓ Logged!' : '🥡 I ate!'}
+        </button>
+      )}
     </div>
   );
 }

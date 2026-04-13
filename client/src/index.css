@@ -90,7 +90,7 @@ html, body {
 }
 
 .nav-icon {
-  font-size: 1.4rem;
+  font-size: 1.75rem;
   line-height: 1;
 }
 
@@ -277,8 +277,8 @@ html, body {
 
 @keyframes toast-life {
   0%   { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  12%  { opacity: 1; transform: translateX(-50%) translateY(0); }
-  78%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  8%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  82%  { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
 }
 
@@ -296,7 +296,50 @@ html, body {
   white-space: nowrap;
   pointer-events: none;
   z-index: 200;
-  animation: toast-life 2.6s ease forwards;
+  animation: toast-life 4s ease forwards;
+}
+
+.toast.interactive {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: normal;
+  width: min(90vw, 480px);
+}
+
+.toast-undo-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.toast-undo-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.restore-btn {
+  width: 100%;
+  min-height: var(--touch);
+  background: var(--surface2);
+  color: var(--muted);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.restore-btn:active {
+  background: #1e2130;
+  color: var(--text);
 }
 
 /* ── Stars ───────────────────────────────────────────────── */

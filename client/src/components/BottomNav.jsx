@@ -13,6 +13,10 @@ export default function BottomNav() {
         </span>
         <span>Add Meal</span>
       </NavLink>
+      <NavLink to="/archive" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <span className="nav-icon">📦</span>
+        <span>Archive</span>
+      </NavLink>
     </nav>
   );
 }

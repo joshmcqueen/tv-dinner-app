@@ -28,5 +28,11 @@ export const consumeMeal = (id, servings = 1) =>
     body: JSON.stringify({ servings }),
   }).then(handleResponse);
 
+export const getArchivedMeals = () =>
+  fetch('/api/meals/archived').then(handleResponse);
+
+export const unconsumeMeal = (id) =>
+  fetch(`/api/meals/${id}/unconsume`, { method: 'PATCH' }).then(handleResponse);
+
 export const deleteMeal = (id) =>
   fetch(`/api/meals/${id}`, { method: 'DELETE' }).then(handleResponse);

@@ -41,6 +41,14 @@ router.get('/all', (req, res) => {
   res.json(meals);
 });
 
+// GET /api/meals/archived — meals with servings = 0
+router.get('/archived', (req, res) => {
+  const meals = db.prepare(
+    'SELECT * FROM meals WHERE servings = 0 ORDER BY cooked_at DESC, updated_at DESC'
+  ).all();
+  res.json(meals);
+});
+
 // GET /api/meals/:id
 router.get('/:id', (req, res) => {
   const meal = db.prepare('SELECT * FROM meals WHERE id = ?').get(req.params.id);
@@ -167,6 +175,24 @@ router.patch('/:id/consume', (req, res) => {
     INSERT INTO consumption_log (id, meal_id, meal_name, servings, consumed_at)
     VALUES (?, ?, ?, ?, ?)
   `).run(uuidv4(), meal.id, meal.name, amount, now);
+
+  const updated = db.prepare('SELECT * FROM meals WHERE id = ?').get(meal.id);
+  res.json(updated);
+});
+
+// PATCH /api/meals/:id/unconsume — undo last consume
+router.patch('/:id/unconsume', (req, res) => {
+  const meal = db.prepare('SELECT * FROM meals WHERE id = ?').get(req.params.id);
+  if (!meal) return res.status(404).json({ error: 'Not found' });
+
+  const now = new Date().toISOString();
+  db.prepare('UPDATE meals SET servings=?, updated_at=? WHERE id=?').run(meal.servings + 1, now, meal.id);
+
+  // Remove most recent consumption_log entry for this meal
+  const lastLog = db.prepare(
+    'SELECT id FROM consumption_log WHERE meal_id = ? ORDER BY consumed_at DESC LIMIT 1'
+  ).get(meal.id);
+  if (lastLog) db.prepare('DELETE FROM consumption_log WHERE id = ?').run(lastLog.id);
 
   const updated = db.prepare('SELECT * FROM meals WHERE id = ?').get(meal.id);
   res.json(updated);

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getMeals, consumeMeal } from '../api.js';
+import { useState, useEffect, useRef } from 'react';
+import { getMeals, consumeMeal, unconsumeMeal } from '../api.js';
 import MealCard from './MealCard.jsx';
 
 export default function MealList() {
@@ -8,6 +8,7 @@ export default function MealList() {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
   useEffect(() => {
     load();
@@ -25,10 +26,28 @@ export default function MealList() {
     }
   }
 
-  function showToast(name) {
+  function showToast(mealId, name) {
+    clearTimeout(toastTimer.current);
     const key = Date.now();
-    setToast({ name, key });
-    setTimeout(() => setToast((t) => (t?.key === key ? null : t)), 2600);
+    toastTimer.current = setTimeout(() => setToast((t) => (t?.key === key ? null : t)), 4000);
+    setToast({ name, key, mealId });
+  }
+
+  async function handleUndo() {
+    if (!toast) return;
+    clearTimeout(toastTimer.current);
+    const { mealId } = toast;
+    setToast(null);
+    try {
+      const restored = await unconsumeMeal(mealId);
+      setMeals((prev) => {
+        const exists = prev.find((m) => m.id === mealId);
+        if (exists) return prev.map((m) => (m.id === mealId ? restored : m));
+        return [restored, ...prev];
+      });
+    } catch (e) {
+      setError(e.message);
+    }
   }
 
   async function handleConsume(id) {
@@ -40,7 +59,7 @@ export default function MealList() {
           ? prev.filter((m) => m.id !== id)
           : prev.map((m) => (m.id === id ? updated : m))
       );
-      if (meal) showToast(meal.name);
+      if (meal) showToast(id, meal.name);
     } catch (e) {
       setError(e.message);
     }
@@ -89,8 +108,9 @@ export default function MealList() {
       )}
 
       {toast && (
-        <div className="toast" key={toast.key}>
-          🥡 Bon appétit! You had some {toast.name}
+        <div className="toast interactive" key={toast.key}>
+          <span>🥡 Bon appétit! You had some {toast.name}</span>
+          <button className="toast-undo-btn" onClick={handleUndo}>Undo</button>
         </div>
       )}
     </div>
