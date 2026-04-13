@@ -1,0 +1,17 @@
+{
+  "name": "tv-dinner-server",
+  "private": true,
+  "scripts": {
+    "start": "NODE_NO_WARNINGS=1 nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
