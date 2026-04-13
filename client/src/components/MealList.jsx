@@ -90,7 +90,7 @@ export default function MealList() {
 
       {toast && (
         <div className="toast" key={toast.key}>
-          🥡 {toast.name}
+          🥡 Bon appétit! You had some {toast.name}
         </div>
       )}
     </div>

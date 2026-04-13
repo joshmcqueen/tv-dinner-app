@@ -68,7 +68,7 @@ export default function MealCard({ meal, onConsume }) {
         {cooked && (
           <div className="cooked-line">
             <span className="cooked-date">{cooked.dateLabel}</span>
-            <span className={`cooked-age ${cooked.days >= 7 ? 'old' : cooked.days >= 4 ? 'aging' : ''}`}>
+            <span className={`cooked-age ${cooked.days >= 21 ? 'old' : cooked.days >= 14 ? 'aging' : ''}`}>
               {cooked.ageLabel}
             </span>
           </div>
