@@ -21,6 +21,7 @@ db.exec(`
     rating      INTEGER CHECK(rating BETWEEN 1 AND 5),
     notes       TEXT,
     servings    INTEGER NOT NULL DEFAULT 1,
+    cooked_at   TEXT,
     created_at  TEXT NOT NULL,
     updated_at  TEXT NOT NULL
   );
@@ -37,6 +38,7 @@ db.exec(`
     rating      INTEGER,
     notes       TEXT,
     servings    INTEGER,
+    cooked_at   TEXT,
     changed_at  TEXT NOT NULL,
     change_note TEXT
   );
@@ -49,5 +51,9 @@ db.exec(`
     consumed_at TEXT NOT NULL
   );
 `);
+
+// Migrations for existing databases
+try { db.exec(`ALTER TABLE meals ADD COLUMN cooked_at TEXT`); } catch {}
+try { db.exec(`ALTER TABLE meal_history ADD COLUMN cooked_at TEXT`); } catch {}
 
 module.exports = db;

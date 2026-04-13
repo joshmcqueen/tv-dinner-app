@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { createMeal, updateMeal, getMeal } from '../api.js';
 import StarRating from './StarRating.jsx';
 
+function todayPT() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(new Date());
+}
+
 const EMPTY = {
   name: '',
   calories: '',
@@ -12,6 +16,7 @@ const EMPTY = {
   rating: 0,
   notes: '',
   servings: 1,
+  cooked_at: todayPT(),
   change_note: '',
 };
 
@@ -42,6 +47,7 @@ export default function MealForm() {
           rating: meal.rating || 0,
           notes: meal.notes || '',
           servings: meal.servings ?? 1,
+          cooked_at: meal.cooked_at || todayPT(),
           change_note: '',
         });
         if (meal.photo_path) setExistingPhoto(`/${meal.photo_path}`);
@@ -81,6 +87,7 @@ export default function MealForm() {
       if (fields.rating) fd.append('rating', fields.rating);
       if (fields.notes.trim()) fd.append('notes', fields.notes.trim());
       fd.append('servings', fields.servings);
+      fd.append('cooked_at', fields.cooked_at);
       if (isEdit && fields.change_note.trim()) fd.append('change_note', fields.change_note.trim());
       if (photoFile) fd.append('photo', photoFile);
 
@@ -149,6 +156,16 @@ export default function MealForm() {
             value={fields.name}
             onChange={(e) => set('name', e.target.value)}
             required
+          />
+        </div>
+
+        {/* Date cooked */}
+        <div className="field">
+          <label>Date cooked{isEdit ? ' (updates entire batch)' : ''}</label>
+          <input
+            type="date"
+            value={fields.cooked_at}
+            onChange={(e) => set('cooked_at', e.target.value)}
           />
         </div>
 

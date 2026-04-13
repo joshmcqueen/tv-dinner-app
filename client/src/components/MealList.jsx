@@ -7,6 +7,7 @@ export default function MealList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     load();
@@ -24,7 +25,14 @@ export default function MealList() {
     }
   }
 
+  function showToast(name) {
+    const key = Date.now();
+    setToast({ name, key });
+    setTimeout(() => setToast((t) => (t?.key === key ? null : t)), 2600);
+  }
+
   async function handleConsume(id) {
+    const meal = meals.find((m) => m.id === id);
     try {
       const updated = await consumeMeal(id, 1);
       setMeals((prev) =>
@@ -32,6 +40,7 @@ export default function MealList() {
           ? prev.filter((m) => m.id !== id)
           : prev.map((m) => (m.id === id ? updated : m))
       );
+      if (meal) showToast(meal.name);
     } catch (e) {
       setError(e.message);
     }
@@ -76,6 +85,12 @@ export default function MealList() {
               <MealCard key={meal.id} meal={meal} onConsume={handleConsume} />
             ))
           )}
+        </div>
+      )}
+
+      {toast && (
+        <div className="toast" key={toast.key}>
+          🥡 {toast.name}
         </div>
       )}
     </div>

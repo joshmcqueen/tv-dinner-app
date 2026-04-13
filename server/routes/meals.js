@@ -61,7 +61,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
   try {
     const id = uuidv4();
     const now = new Date().toISOString();
-    const { name, calories, protein, carbs, fat, rating, notes, servings } = req.body;
+    const { name, calories, protein, carbs, fat, rating, notes, servings, cooked_at } = req.body;
 
     let photo_path = null;
     if (req.file) {
@@ -70,8 +70,8 @@ router.post('/', upload.single('photo'), async (req, res) => {
     }
 
     db.prepare(`
-      INSERT INTO meals (id, name, photo_path, calories, protein, carbs, fat, rating, notes, servings, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO meals (id, name, photo_path, calories, protein, carbs, fat, rating, notes, servings, cooked_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id, name, photo_path,
       calories ? parseInt(calories) : null,
@@ -81,6 +81,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
       rating ? parseInt(rating) : null,
       notes || null,
       servings ? parseInt(servings) : 1,
+      cooked_at || null,
       now, now
     );
 
@@ -99,16 +100,16 @@ router.put('/:id', upload.single('photo'), async (req, res) => {
     if (!current) return res.status(404).json({ error: 'Not found' });
 
     const now = new Date().toISOString();
-    const { name, calories, protein, carbs, fat, rating, notes, servings, change_note } = req.body;
+    const { name, calories, protein, carbs, fat, rating, notes, servings, cooked_at, change_note } = req.body;
 
     // Snapshot current to history
     db.prepare(`
-      INSERT INTO meal_history (id, meal_id, name, photo_path, calories, protein, carbs, fat, rating, notes, servings, changed_at, change_note)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO meal_history (id, meal_id, name, photo_path, calories, protein, carbs, fat, rating, notes, servings, cooked_at, changed_at, change_note)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       uuidv4(), current.id, current.name, current.photo_path,
       current.calories, current.protein, current.carbs, current.fat,
-      current.rating, current.notes, current.servings, now,
+      current.rating, current.notes, current.servings, current.cooked_at, now,
       change_note || null
     );
 
@@ -118,8 +119,16 @@ router.put('/:id', upload.single('photo'), async (req, res) => {
       photo_path = `uploads/${req.file.filename}`;
     }
 
+    const newCookedAt = cooked_at !== undefined ? (cooked_at || null) : current.cooked_at;
+
+    // If the cook date changed, update the whole batch (all meals with the old date)
+    if (cooked_at !== undefined && cooked_at !== current.cooked_at && current.cooked_at) {
+      db.prepare(`UPDATE meals SET cooked_at=?, updated_at=? WHERE cooked_at=?`)
+        .run(newCookedAt, now, current.cooked_at);
+    }
+
     db.prepare(`
-      UPDATE meals SET name=?, photo_path=?, calories=?, protein=?, carbs=?, fat=?, rating=?, notes=?, servings=?, updated_at=?
+      UPDATE meals SET name=?, photo_path=?, calories=?, protein=?, carbs=?, fat=?, rating=?, notes=?, servings=?, cooked_at=?, updated_at=?
       WHERE id=?
     `).run(
       name || current.name,
@@ -131,6 +140,7 @@ router.put('/:id', upload.single('photo'), async (req, res) => {
       rating !== undefined ? (rating ? parseInt(rating) : null) : current.rating,
       notes !== undefined ? (notes || null) : current.notes,
       servings !== undefined ? parseInt(servings) : current.servings,
+      newCookedAt,
       now,
       req.params.id
     );

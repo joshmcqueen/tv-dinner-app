@@ -221,6 +221,27 @@ html, body {
   font-weight: 600;
 }
 
+.cooked-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.cooked-age {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.cooked-age.aging {
+  color: var(--accent);
+}
+
+.cooked-age.old {
+  color: var(--danger);
+}
+
 .consume-btn {
   width: 100%;
   min-height: var(--touch);
@@ -230,13 +251,52 @@ html, body {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
   padding: 10px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .consume-btn:active {
+  transform: scale(0.96);
   background: var(--accent-dim);
+}
+
+.consume-btn.eating {
+  background: #14532d;
+  color: #86efac;
+  animation: btn-pop 0.25s ease;
+}
+
+@keyframes btn-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+
+@keyframes toast-life {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  12%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  78%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+}
+
+.toast {
+  position: fixed;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #14532d;
+  color: #86efac;
+  padding: 11px 22px;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 200;
+  animation: toast-life 2.6s ease forwards;
 }
 
 /* ── Stars ───────────────────────────────────────────────── */
