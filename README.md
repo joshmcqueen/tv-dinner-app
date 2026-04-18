@@ -1,6 +1,6 @@
 # TV Dinners
 
-A mobile-first meal prep tracker. Log batches of meals, track macros and servings, rate what you've made, and mark portions as eaten.
+A mobile-first meal prep tracker. Log batches of meals, track macros and servings, rate what you've made, and mark portions as eaten. Meals with no servings remaining move to an archive view with undo support.
 
 ## Stack
 
@@ -57,6 +57,8 @@ Both are created automatically on first boot if empty.
 
 | Table | Purpose |
 |-------|---------|
-| `meals` | Active meal preps (name, macros, servings, photo, rating) |
+| `meals` | All meal preps (name, macros, servings, photo, rating); `servings = 0` means archived |
 | `meal_history` | Snapshot saved on each edit |
-| `consumption_log` | Audit trail when servings are decremented |
+| `consumption_log` | Audit trail when servings are decremented (used for undo) |
+
+Meals cooked on the same date are treated as a batch — editing the cook date on one updates all meals from that session.

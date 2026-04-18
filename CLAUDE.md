@@ -28,14 +28,16 @@ pnpm monorepo with two packages: `server/` (Express + SQLite) and `client/` (Rea
 - `routes/meals.js` — All REST endpoints under `/api/meals`
 
 **Frontend** (`client/src/`):
-- `App.jsx` — React Router setup (4 routes)
+- `App.jsx` — React Router setup (5 routes: `/`, `/add`, `/meal/:id`, `/meal/:id/edit`, `/archive`)
 - `api.js` — Thin fetch wrapper; all API calls go through here
-- `components/` — Six components: `MealList`, `MealCard`, `MealDetail`, `MealForm`, `StarRating`, `BottomNav`
+- `components/` — Seven components: `MealList`, `MealCard`, `MealDetail`, `MealForm`, `StarRating`, `BottomNav`, `ArchiveList`
 
 **Data model** (SQLite, stored in `server/data/tvdinner.db`):
 - `meals` — Active meal preps with macros, rating, servings, photo path
 - `meal_history` — Snapshot of old meal data whenever a meal is edited (stored as JSON blob)
 - `consumption_log` — Audit trail written when servings are decremented via `PATCH /:id/consume`
+
+**Batch date behavior**: Changing `cooked_at` on a meal updates all meals sharing that same date — they're treated as a cook session.
 
 **Image pipeline**: Multer receives uploads → Sharp rotates (EXIF-aware), resizes to max 1200×1200, encodes as JPEG at quality 85 → saved to `server/uploads/` with UUID filename → path stored in DB.
 

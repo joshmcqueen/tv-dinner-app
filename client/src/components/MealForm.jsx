@@ -141,7 +141,6 @@ export default function MealForm() {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             className="photo-input"
             onChange={handlePhotoChange}
           />
