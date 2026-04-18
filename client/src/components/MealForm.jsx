@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createMeal, updateMeal, getMeal } from '../api.js';
 import StarRating from './StarRating.jsx';
+import ImageCropModal from './ImageCropModal.jsx';
 
 function todayPT() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(new Date());
@@ -29,6 +30,7 @@ export default function MealForm() {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [existingPhoto, setExistingPhoto] = useState(null);
+  const [cropSrc, setCropSrc] = useState(null);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -63,8 +65,21 @@ export default function MealForm() {
   function handlePhotoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    setCropSrc(URL.createObjectURL(file));
+    e.target.value = '';
+  }
+
+  function handleCropConfirm(blob) {
+    const url = URL.createObjectURL(blob);
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setPhotoFile(blob);
+    setPhotoPreview(url);
+    setCropSrc(null);
+  }
+
+  function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
   }
 
   async function handleSubmit(e) {
@@ -250,6 +265,14 @@ export default function MealForm() {
           {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add to freezer'}
         </button>
       </form>
+
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 }
