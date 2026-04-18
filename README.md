@@ -50,7 +50,14 @@ Both are created automatically on first boot if empty.
 
 1. Point Dokploy at this repo — it will detect the `Dockerfile` automatically.
 2. Set port to **3000**.
-3. Add the two persistent volumes above.
+3. Go to the **Storage** tab and add two persistent volume mounts:
+
+   | Mount path | Purpose |
+   |---|---|
+   | `/app/server/data` | SQLite database |
+   | `/app/server/uploads` | User photo uploads |
+
+   Without these, all data is lost on every redeploy.
 4. Deploy.
 
 ## Data Model
