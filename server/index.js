@@ -1,27 +1,24 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const os = require('os');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const clientDist = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(clientDist));
 
 app.use('/api/meals', require('./routes/meals'));
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n🍱  TV Dinners API running on port ${PORT}`);
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
 
-  const nets = os.networkInterfaces();
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      if (net.family === 'IPv4' && !net.internal) {
-        console.log(`   Local network: http://${net.address}:5173`);
-      }
-    }
-  }
-  console.log('');
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`TV Dinners running on port ${PORT}`);
 });
