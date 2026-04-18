@@ -74,7 +74,7 @@ export default function MealList() {
       <div className="page-header">
         <h1 className="page-title">📺 TV Dinners</h1>
         <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-          {meals.length} meal{meals.length !== 1 ? 's' : ''}
+          {meals.length} meal{meals.length !== 1 ? 's' : ''} · {meals.reduce((sum, m) => sum + (m.servings ?? 0), 0)} serving{meals.reduce((sum, m) => sum + (m.servings ?? 0), 0) !== 1 ? 's' : ''}
         </span>
       </div>
 
